@@ -1,26 +1,40 @@
 var get        = require('../lib/get')
-var resolve    = require('url').resolve
-var join       = require('path').join
-var config     = require('../config')
+  , resolve    = require('url').resolve
+  , join       = require('path').join
+  , config     = require('../config')
 //, funders    = require('./funders')
 //, iterations = require('./iterations')
 //, iteration  = require('./iteration')
+  , movie      = require('./movie')
 
+/**
 var auth = (
   config.id && config.secret ?
   '?client_id='+config.id+'&client_secret='+config.secret
   : ''
 )
+*/
 
-function ghApi() {
-  return resolve('https://api.github.com', join.apply(null, arguments)) + auth + (auth ? '&' : '?') + 'per_page=100'
+function dbApi() {
+  return resolve('https://api.themoviedb.org/3/', join.apply(null, arguments)) + '?api_key=' + config.key
 }
 
+/**
 function bcApi() {
   return resolve('https://blockchain.info', join.apply(null, arguments) + '?format=json')
 }
+*/
 
 var api = exports
+
+api.movie = function(id, cb) {
+  get.all([
+    dbApi('movie', id)
+  ], function(err, args) {
+    if (err) return cb(err)
+    cb(null, movie.apply(null, args))
+  })
+}
 
 /**
 api.funders = function (user, repo, issue, wallet, cb) {

@@ -2,7 +2,7 @@
 var views = exports
 var layout = require('./layout')
 
-//views.iteration = layout(require('./iteration'))
+views.movie = layout(require('./movie'))
 
 if(!module.parent) {
   var method = process.argv[2]

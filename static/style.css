@@ -20,6 +20,20 @@ li, p {
   color: #3d3d3d;
 }
 
+dl {
+  font-size: 14px;
+  line-height: 1.75em;
+}
+
+dt {
+  font-weight: bold;
+}
+
+dd {
+  font-size: 18px;
+  font-style: italic;
+}
+
 front_page li, p {
   font-size: 1.5em;
   line-height: 1.4em;
