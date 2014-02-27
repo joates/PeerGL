@@ -1,7 +1,16 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <style>*{margin:0;padding:0;}html,body{width:100%;height:100%;}canvas{display:block}</style>
+    <style>
+      *{margin:0;padding:0;}html,body{width:100%;height:100%;overflow:hidden;}canvas{display:block}
+      #cmd-text-input::before { content:'cmd> '; }
+      #cmd-text-input{ width:100%;position:absolute;left:0;bottom:0;
+                       z-index:9999;background-color:#444;color:#0f0;border:none;
+                       margin:0;padding:5px 10px;opacity:0.6;font-size:0.96em;
+                     }
+      #cmd-text-input.show{bottom:0;}
+      #cmd-text-input.hide{bottom:-2em;-webkit-transition:bottom .5s ease-in-out;}
+    </style>
     <script src="js/three.min.js"></script>
     <script src="js/extras/libs/stats.min.js"></script>
     <script src="js/extras/libs/tween.min.js"></script>

@@ -2,7 +2,7 @@
 
 #### checklist
 * ☑ WebGL
-* ☐ input type=text
+* ☑ input type=text
 * ☑ ws
 * ☐ node.js (API)
 * ☐ camlistore

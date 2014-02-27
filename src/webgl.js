@@ -1,5 +1,6 @@
 var domready = require('domready')
   ,      raf = require('raf')
+  ,      cmd = require('./cmd').create()
   ,      sio = io.connect('http://localhost:8000')
 
   , width     = window.innerWidth
@@ -38,6 +39,8 @@ module.exports = {
 
                     self.renderer.setSize(width, height)
                     document.body.appendChild(self.renderer.domElement)
+
+                    document.body.appendChild(cmd)
 
                     self.stats = new Stats()
                   	self.stats.domElement.style.position = 'absolute'
@@ -131,33 +134,29 @@ module.exports = {
   , onkeydown: function(event) {
                 switch(event.which || event.keyCode) {
 
-                  case 38:  /*up*/
-                  case 87:  /*W*/
-                    sio.emit('message', { key: 'W' }); break
+                  case 190:  /*dot*/
+                    if (!cmd.hasFocus)
+                      cmd.className='show'; cmd.focus(); break
 
-                  case 40:  /*down*/
-                  case 83:  /*S*/
-                    sio.emit('message', { key: 'S' }); break
+                  case 13:   /*enter*/
+                    if (cmd.hasFocus && cmd.value.substr(0,1) === '.' && cmd.value.length > 1) {
+                      sio.emit('message', {cmd:cmd.value.replace(/^(\s|\.)*/, '')}); cmd.value=''; break }
+                    else { cmd.className='show'; cmd.focus(); break }
 
-                  case 37:  /*left*/
-                  case 65:  /*A*/
-                    sio.emit('message', { key: 'A' }); break
-
-                  case 39:  /*right*/
-                  case 68:  /*D*/
-                    sio.emit('message', { key: 'D' }); break
+                  case 27:  /*esc*/
+                    cmd.className='hide';cmd.value='';cmd.blur();break
                 }
               }
 
   , onmousedown: function(event) {
                 if (event.ctrlKey) {
-                  sio.emit('message', { camera: camera.position })
+                  //sio.emit('message', { camera: camera.position })
                 }
               }
 
   , onmouseup: function(event) {
                 if (event.ctrlKey) {
-                  sio.emit('message', { camera: camera.position })
+                  //sio.emit('message', { camera: camera.position })
                 }
               }
 
