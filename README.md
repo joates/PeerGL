@@ -1,4 +1,11 @@
-PeerGL
-======
+# PeerGL
 
-try all the new things, see if it breaks.. (node.js / WebGL / WebRTC)
+#### checklist
+* ☑ WebGL
+* ☐ input type=text
+* ☐ ws
+* ☐ node.js (API)
+* ☐ camlistore
+* ☐ dat.GUI (_obj settings_)
+* ☐ WebRTC
+* ☐ xtcoin
