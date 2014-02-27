@@ -7,6 +7,8 @@ var https       = require('https')
   , route       = require('tiny-route')
   , ecstatic    = require('ecstatic')
   , stack       = require('stack')
+  , io          = require('socket.io')
+  , Transcoder  = require('stream-transcoder')
 
   , config      = require('./config')
   , api         = require('./api')
@@ -22,6 +24,7 @@ var app = stack(
 
 var secure = process.getuid() === 0
 
+/*
 if(secure) {
 
   https.createServer({
@@ -41,3 +44,31 @@ if(secure) {
 } else {
   http.createServer(app).listen(config.port)
 }
+*/
+
+  var server = http.createServer(app).listen(config.port)
+    , sio    = io.listen(server)
+
+  sio.configure(function () {
+    sio.set('log level', 0)
+    sio.set('authorization', function (handshakeData, callback) {
+      callback(null, true)   // error first callback style
+    })
+  })
+
+  //  Register event handlers & callbacks.
+
+  sio.sockets.on('connection', function (socket) {
+
+    socket.on('message', function(msg) {
+      //
+      //console.log(JSON.stringify(msg))
+      socket.send('/video.mp4')
+    })
+
+    socket.on('disconnect', function() {
+      //
+      //console.log('disconnected')
+    })
+
+  })

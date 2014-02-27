@@ -1,5 +1,5 @@
 #content {
-  max-width: 900px;
+  max-width: 960px;
   margin: auto;
   color: #333333;
   background-color: #ffffff;
@@ -9,11 +9,15 @@
   border-radius: 5px;
   box-shadow: 5px 3px 5px hsla(0,0%,50%,0.1);
   padding-bottom: 20px;
-//;
 }
 
 body {
   background-color: #eeeeee;
+}
+
+div #img-container {
+  display: inline-block;
+  padding: 10px;
 }
 
 li, p {

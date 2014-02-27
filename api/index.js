@@ -5,7 +5,8 @@ var get        = require('../lib/get')
 //, funders    = require('./funders')
 //, iterations = require('./iterations')
 //, iteration  = require('./iteration')
-  , movie      = require('./movie')
+//, movie      = require('./movie')
+  , tmdb   = require('moviedb')(config.key)
 
 /**
 var auth = (
@@ -15,8 +16,12 @@ var auth = (
 )
 */
 
-function dbApi() {
+function tmdbApi() {
   return resolve('https://api.themoviedb.org/3/', join.apply(null, arguments)) + '?api_key=' + config.key
+}
+
+function omdbApi() {
+  return resolve('http://www.omdbapi.com/?', join.apply(null, arguments))
 }
 
 /**
@@ -28,13 +33,23 @@ function bcApi() {
 var api = exports
 
 api.movie = function(id, cb) {
+  tmdb.miscNowPlayingMovies(function(err, res) {
+    if (err) return err
+    //console.error(res.results)
+    cb(null, res.results)
+  })
+}
+
+/**
+api.movie = function(id, cb) {
   get.all([
-    dbApi('movie', id)
+    tmdbApi('movie', id)
   ], function(err, args) {
     if (err) return cb(err)
     cb(null, movie.apply(null, args))
   })
 }
+*/
 
 /**
 api.funders = function (user, repo, issue, wallet, cb) {
