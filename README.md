@@ -3,7 +3,7 @@
 #### checklist
 * ☑ WebGL
 * ☐ input type=text
-* ☐ ws
+* ☑ ws
 * ☐ node.js (API)
 * ☐ camlistore
 * ☐ dat.GUI (_obj settings_)

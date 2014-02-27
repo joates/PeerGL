@@ -4,7 +4,8 @@
   "description": "WebGL experiment",
   "dependencies": {
     "domready": "^0.2.x",
-    "raf": "^0.0.3"
+    "raf": "~0.0.3",
+    "socket.io": "^0.9.x"
   },
   "devDependencies": {
     "watchify": "^0.5.6"

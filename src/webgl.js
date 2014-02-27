@@ -1,5 +1,6 @@
 var domready = require('domready')
   ,      raf = require('raf')
+  ,      sio = io.connect('http://localhost:8000')
 
   , width     = window.innerWidth
   , height    = window.innerHeight
@@ -45,6 +46,9 @@ module.exports = {
                 		document.body.appendChild(self.stats.domElement)
 
                     window.addEventListener('resize', self.resize.bind(self), false)
+                    document.addEventListener('keydown', self.onkeydown.bind(self), false)
+                    document.addEventListener('mousedown', self.onmousedown.bind(self), false)
+                    document.addEventListener('mouseup', self.onmouseup.bind(self), false)
 
                     if (window.devicePixelRatio !== undefined) {
                       dpr = window.devicePixelRatio
@@ -122,6 +126,39 @@ module.exports = {
                 this.renderer.setSize(width, height)
                 camera.aspect = width / height
                 camera.updateProjectionMatrix()
+              }
+
+  , onkeydown: function(event) {
+                switch(event.which || event.keyCode) {
+
+                  case 38:  /*up*/
+                  case 87:  /*W*/
+                    sio.emit('message', { key: 'W' }); break
+
+                  case 40:  /*down*/
+                  case 83:  /*S*/
+                    sio.emit('message', { key: 'S' }); break
+
+                  case 37:  /*left*/
+                  case 65:  /*A*/
+                    sio.emit('message', { key: 'A' }); break
+
+                  case 39:  /*right*/
+                  case 68:  /*D*/
+                    sio.emit('message', { key: 'D' }); break
+                }
+              }
+
+  , onmousedown: function(event) {
+                if (event.ctrlKey) {
+                  sio.emit('message', { camera: camera.position })
+                }
+              }
+
+  , onmouseup: function(event) {
+                if (event.ctrlKey) {
+                  sio.emit('message', { camera: camera.position })
+                }
               }
 
 }
