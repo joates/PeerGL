@@ -1,7 +1,6 @@
 var domready = require('domready')
   ,      raf = require('raf')
-  ,      cmd = require('./cmd').create()
-  ,      sio = io.connect('http://localhost:8000')
+  ,      cmd = require('./cmd_ui').create()
 
   , width     = window.innerWidth
   , height    = window.innerHeight
@@ -20,6 +19,37 @@ var domready = require('domready')
                 )
   , dpr = 1
   , effectFXAA = new THREE.ShaderPass(THREE.FXAAShader)
+
+  , sio = io.connect('http://localhost:8000')
+
+function delayed_hide() {
+  setTimeout(function(){cmd.className='hide';setTimeout(function(){cmd.value=''}, 10)}, 2200)
+}
+
+function init_sockets() {
+  sio.on('response', function(msg) {
+    cmd.value = msg
+    cmd.disabled = true
+    cmd.className = 'show'
+    cmd.classList.add('cmd_ok')
+    cmd.classList.remove('cmd_warn', 'cmd_fail')
+    delayed_hide()
+  })
+  sio.on('warn', function(data) {
+    cmd.value = data
+    cmd.disabled = true
+    cmd.className = 'show'
+    cmd.classList.add('cmd_warn')
+    delayed_hide()
+  })
+  sio.on('fail', function(data) {
+    cmd.value = data
+    cmd.disabled = true
+    cmd.className = 'show'
+    cmd.classList.add('cmd_fail')
+    delayed_hide()
+  })
+}
 
 module.exports = {
 
@@ -47,6 +77,8 @@ module.exports = {
                 		self.stats.domElement.style.top = '0px'
                 		self.stats.domElement.style.left = '0px'
                 		document.body.appendChild(self.stats.domElement)
+
+                    init_sockets()
 
                     window.addEventListener('resize', self.resize.bind(self), false)
                     document.addEventListener('keydown', self.onkeydown.bind(self), false)
@@ -136,12 +168,12 @@ module.exports = {
 
                   case 190:  /*dot*/
                     if (!cmd.hasFocus)
-                      cmd.className='show'; cmd.focus(); break
+                        cmd.disabled = false; cmd.className='show'; cmd.focus(); break
 
                   case 13:   /*enter*/
                     if (cmd.hasFocus && cmd.value.substr(0,1) === '.' && cmd.value.length > 1) {
                       sio.emit('message', {cmd:cmd.value.replace(/^(\s|\.)*/, '')}); cmd.value=''; break }
-                    else { cmd.className='show'; cmd.focus(); break }
+                    else {   cmd.disabled = false; cmd.className='show'; cmd.focus(); break }
 
                   case 27:  /*esc*/
                     cmd.className='hide';cmd.value='';cmd.blur();break

@@ -11,6 +11,7 @@
     "watchify": "^0.5.6"
   },
   "scripts": {
+    "build": "browserify src/index.js -o public/main.js &",
     "watch": "watchify src/index.js -o public/main.js &",
     "start": "node server.js"
   },
