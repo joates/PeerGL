@@ -1,6 +1,7 @@
 var domready = require('domready')
   ,      raf = require('raf')
   ,      cmd = require('./cmd_ui').create()
+  ,    Floor = require('./Floor')
 
   , width     = window.innerWidth
   , height    = window.innerHeight
@@ -21,6 +22,17 @@ var domready = require('domready')
   , effectFXAA = new THREE.ShaderPass(THREE.FXAAShader)
 
   , sio = io.connect('http://localhost:8000')
+
+    // hex-floor
+  , f = new Floor(520, 80)
+  , floorMesh = new THREE.Object3D()
+
+function get_random_color() {
+  function c() {
+    return Math.floor(64+Math.random()*64).toString(16)
+  }
+  return "#"+c()+c()+c()
+}
 
 function delayed_hide() {
   setTimeout(function(){cmd.className='hide';setTimeout(function(){cmd.value=''}, 10)}, 2200)
@@ -59,12 +71,51 @@ module.exports = {
                 var self = this
                 process.nextTick(function() {
                   domready(function() {
-                    scene.add(box)
-                    stage.position.y -= 10
-                    scene.add(stage)
+
+                    f.tiles.forEach(function(tile, i){
+                      if (tile.solid) {
+
+                        var solidMaterial = new THREE.MeshBasicMaterial({ color: 0x306090, side: THREE.DoubleSide })
+                          , tileGeometry = new THREE.Geometry()
+                        tileGeometry.vertices.push(new THREE.Vector3(tile.position.x, tile.position.y, tile.position.z))
+                        tile.verts.forEach(function(vert, i){
+                          tileGeometry.vertices.push(new THREE.Vector3(vert.x, vert.y, vert.z))
+                        })
+                        // add faces for solid geometry..
+                        tileGeometry.faces.push(new THREE.Face3(0, 1, 2))
+                        tileGeometry.faces.push(new THREE.Face3(0, 2, 3))
+                        tileGeometry.faces.push(new THREE.Face3(0, 3, 4))
+                        tileGeometry.faces.push(new THREE.Face3(0, 4, 5))
+                        tileGeometry.faces.push(new THREE.Face3(0, 5, 6))
+                        tileGeometry.faces.push(new THREE.Face3(0, 6, 1))
+                        tileGeometry.verticesNeedUpdate = true
+                        tileGeometry.elementsNeedUpdate = true
+                        var mesh = new THREE.Mesh(tileGeometry, solidMaterial)
+                        floorMesh.add(mesh)
+
+                      } else {
+                        var randomColor = get_random_color()
+                          , tileMaterial = new THREE.LineBasicMaterial({ color: randomColor, linewidth: 4 })
+                          , tileGeometry = new THREE.Geometry()
+                        tile.verts.forEach(function(vert, i){
+                          tileGeometry.vertices.push(new THREE.Vector3(vert.x, vert.y, vert.z))
+                        })
+                        tileGeometry.vertices.push(new THREE.Vector3(tile.verts[0].x, tile.verts[0].y, tile.verts[0].z))
+                        var mesh = new THREE.Line(tileGeometry, tileMaterial)
+                        floorMesh.add(mesh)
+                      }
+                    })
+
+                    scene.add(floorMesh)
+
+                    //scene.add(box)
+                    //stage.position.y -= 10
+                    //scene.add(stage)
+
                     scene.add(light)
                     scene.add(new THREE.AmbientLight(0x202020))
-                    camera.position.z = 100
+                    camera.position.y = 400
+                    camera.position.z = 1200
                     camera.lookAt(0, 0, 0)
 
                     self.renderer.setSize(width, height)
