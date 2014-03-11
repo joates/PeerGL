@@ -1,18 +1,20 @@
 var Hex = require('./Hex')
+  , crater_perimeter_elevation
 
 function Floor(radius, tileSize) {
   this.radius   = radius || 200
   this.tileSize = tileSize || 60
   this.tiles = []
   this.core = this.locate_core()
+  crater_perimeter_elevation = this.radius * 0.05  // edge bump.
   this.init()
 }
 
 Floor.prototype.locate_core = function() {
-  // we assume a 30-60-90 triangle to calc altitude-side length.
-  var h = Math.sqrt(3) * this.radius / 2
-    , r = this.radius * 2
-  return {radius: r, position: {x:0, y:h, z:0}}
+  // we use 30-60-90 triangle to calc length of altitude side.
+  var r = this.radius * 2
+    , h = (Math.sqrt(3) * r) / 2
+  return { radius: r, position: {x: 0, y: h, z: 0} }
 }
 
 Floor.prototype.init = function() {
@@ -27,16 +29,7 @@ Floor.prototype.addTile = function(q, r) {
 
   hex.verts.forEach(function(vert, i) {
 
-    // circular perimeter.
     var length = Math.sqrt(vert.x * vert.x + vert.y * vert.y + vert.z * vert.z)
-    if (length > that.radius) {
-      verts_inside_radius--
-      /**  uncomment this section for a circular perimeter.
-      var scalar = that.radius/length
-      vert.x *= scalar
-      vert.y *= scalar
-      vert.z *= scalar  */
-    }
 
     // inverted dome.
     var origin = that.core.position
@@ -45,20 +38,24 @@ Floor.prototype.addTile = function(q, r) {
       , dz = vert.z - origin.z
       , distance_to_core = Math.sqrt(dx * dx + dy * dy + dz * dz)
     
-    var scalar = that.core.radius - distance_to_core
-    if (length <= that.radius) vert.y = 200 - scalar / 2
+    var scalar = distance_to_core - that.core.radius
+    if (length <= that.radius) vert.y =  scalar + crater_perimeter_elevation
+
+    // circular perimeter.
+    if (length > that.radius) {
+      verts_inside_radius--
+      /**  uncomment this section to actually render the circular perimeter.
+      var scalar = that.radius/length
+      vert.x *= scalar
+      vert.y *= scalar
+      vert.z *= scalar  */
+    }
   })
 
-  // when at least 1 of a tiles vertices falls inside the
-  // perimeter radius the full tile is rendered.
-  // (but tiles with all vertices external to perimeter are culled)
-  if (verts_inside_radius > 0) {
-    this.tiles.push(hex)
-  } else {
-    hex.solid = true
-    this.tiles.push(hex)
-  }
+  // tiles with all vertices outside of perimeter are rendered solid.
+  if (verts_inside_radius === 0) hex.solid = true
 
+  this.tiles.push(hex)
   return hex
 }
 
